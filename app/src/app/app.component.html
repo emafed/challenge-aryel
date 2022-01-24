@@ -1,0 +1,18 @@
+<mat-toolbar>
+  <span>Challenge Aryel</span>
+  <span class="example-spacer"></span>
+  <button mat-raised-button color="primary" [matMenuTriggerFor]="menu">Nuovo</button>
+</mat-toolbar>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>
+    <mat-icon>insert_drive_file</mat-icon>
+    Carica File
+  </button>
+  <button mat-menu-item>
+    <mat-icon>create_new_folder</mat-icon>
+    Crea Cartella
+  </button>
+</mat-menu>
+
+<router-outlet></router-outlet>
