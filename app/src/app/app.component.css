@@ -1,3 +1,21 @@
 .example-spacer {
     flex: 1 1 auto;
   }
+.mat-list-icon  {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+
+.home{
+  padding: 10px;
+}
+
+.mat-table {
+background: white;
+}
+
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+  color:black;
+  /* border-bottom: 1px solid black; */
+}
+
