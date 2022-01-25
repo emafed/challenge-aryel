@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -10,12 +10,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
-import { UploadDialog } from './upload-dialog/upload-dialog';
+import { NewFolderDialog } from './newfolder-dialog/newfolder-dialog';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UploadDialog
+    NewFolderDialog
   ],
   imports: [
     BrowserModule,
@@ -26,7 +28,10 @@ import { UploadDialog } from './upload-dialog/upload-dialog';
     MatButtonModule,
     MatMenuModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatInputModule,
+    MatFormFieldModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

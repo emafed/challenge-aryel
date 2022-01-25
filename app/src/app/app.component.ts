@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { UploadDialog } from './upload-dialog/upload-dialog';
+import { NewFolderDialog } from './newfolder-dialog/newfolder-dialog';
+import { HttpService } from './http-service/http.service';
 
 export interface PeriodicElement {
   name: string;
@@ -30,12 +31,24 @@ const ELEMENT_DATA: PeriodicElement[] = [
 
 
 export class AppComponent {
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private httpService: HttpService) { }
   title = 'challenge-aryel';
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = ELEMENT_DATA;
 
   openDialog() {
-    this.dialog.open(UploadDialog);
+    this.dialog.open(NewFolderDialog);
+  }
+
+
+  onFileSelected(event: any) {
+    let fileList: FileList = event.target.files;
+    if (fileList.length > 0) {
+      let file: File = fileList[0];
+      let formData: FormData = new FormData();
+      formData.append('uploadFile', file, file.name);
+      this.httpService.upload(formData,"FILE")
+    }
+
   }
 }

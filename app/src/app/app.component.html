@@ -5,11 +5,16 @@
 </mat-toolbar>
 
 <mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="openDialog()">
+  <button mat-menu-item (click)="fileInput.click()">
     <mat-icon>insert_drive_file</mat-icon>
     Carica File
   </button>
-  <button mat-menu-item>
+
+
+  <input hidden (change)="onFileSelected($event)" #fileInput type="file" id="file">
+
+
+  <button mat-menu-item (click)="openDialog()">
     <mat-icon>create_new_folder</mat-icon>
     Crea Cartella
   </button>

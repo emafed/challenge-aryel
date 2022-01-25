@@ -1,7 +1,12 @@
+var cors = require('cors')
 const mongoose = require('mongoose');
 const express = require('express')
 const app = express()
+app.use(cors({origin: '*'}))
 const port = 3000
+var FormData = require('form-data');
+var fs = require('fs');
+ 
 
 const { Schema } = mongoose;
 
@@ -24,11 +29,14 @@ async function mongoConnect() {
   await mongoose.connect('mongodb://localhost:27017/test');
 }
 
-app.get('/', (req, res) => {
+app.post('/', (req, res) => {
+  console.log(req)
+  var form = new FormData();
+  form.append('my_file', fs.createReadStream('/foo/bar.jpg'));
   res.send('Hello World!')
 })
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`)
-  this.mongoConnect()
+  mongoConnect()
 })
