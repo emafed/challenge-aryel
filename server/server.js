@@ -1,42 +1,36 @@
 var cors = require('cors')
-const mongoose = require('mongoose');
 const express = require('express')
-const app = express()
-app.use(cors({origin: '*'}))
-const port = 3000
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 var FormData = require('form-data');
 var fs = require('fs');
- 
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
+const app = express()
+app.use(cors())
+const port = 3000
+const dataSchema = new Schema({root: Object}, { collection: 'root' });
+const Root = mongoose.model('root', dataSchema);
 
-const { Schema } = mongoose;
 
-const blogSchema = new Schema({
-  title:  String, // String is shorthand for {type: String}
-  author: String,
-  body:   String,
-  comments: [{ body: String, date: Date }],
-  date: { type: Date, default: Date.now },
-  hidden: Boolean,
-  meta: {
-    votes: Number,
-    favs:  Number
-  }
-});
-
+async function createRootDocument(){
+  const rootDocument = new Root({ root: {} });
+  await rootDocument.save()
+}
 
 
 async function mongoConnect() {
-  await mongoose.connect('mongodb://localhost:27017/test');
+  // crea il "db" se non esiste
+  await mongoose.connect('mongodb://localhost:27017/db');
 }
 
-app.post('/', (req, res) => {
-  console.log(req)
-  var form = new FormData();
-  form.append('my_file', fs.createReadStream('/foo/bar.jpg'));
-  res.send('Hello World!')
+app.post('/uploadFile', upload.single('file'), (req, res) => {
+  console.log(req.file.path)
+  res.sendStatus(200);
 })
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`)
   mongoConnect()
+  //createRootDocument()
 })

@@ -46,9 +46,10 @@ export class AppComponent {
     if (fileList.length > 0) {
       let file: File = fileList[0];
       let formData: FormData = new FormData();
-      formData.append('uploadFile', file, file.name);
-      this.httpService.upload(formData,"FILE")
+      formData.append('file', file, file.name);
+      this.httpService.upload(formData, "FILE").subscribe((data: any) => {
+        console.log(data)
+      }, (error: any) => { console.log(error) })
     }
-
   }
 }
