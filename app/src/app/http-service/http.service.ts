@@ -16,4 +16,7 @@ export class HttpService {
   upload(file: any, type: String): any {
     return this.http.post<any>(this.endpoint + "/uploadFile", file, this.headerConfig)
   }
+  getFiles(){
+    return this.http.get<any>(this.endpoint + "/getFiles", this.headerConfig)
+  }
 }
