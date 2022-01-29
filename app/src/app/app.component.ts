@@ -5,6 +5,7 @@ import { HttpService } from './http-service/http.service';
 import { ViewChild } from '@angular/core';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import * as FileSaver from 'file-saver';
 
 export interface Files {
   type: String,
@@ -58,7 +59,7 @@ export class AppComponent {
 
   deleteFile(_id: String) {
     this.httpService.deleteFile(_id).subscribe({
-      complete: () => { 
+      complete: () => {
         this.getFiles()
         this.openSnackBar("File eliminato")
       },
@@ -66,8 +67,12 @@ export class AppComponent {
     });
   }
 
-  downloadFile(_id: String){
-    this.httpService.downloadFile(_id)
+  downloadFile(_id: String) {
+    this.httpService.downloadFile(_id).subscribe(x => {
+      let fileName = ((x.headers.get("Content-Disposition")).split('filename=')[1].split(';')[0]).replaceAll('"', '')
+      FileSaver.saveAs(x.body, fileName)
+    });
+
   }
 
   onFileSelected(event: any) {

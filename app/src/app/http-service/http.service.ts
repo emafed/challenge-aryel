@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import * as saveAs from 'file-saver';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,20 +25,13 @@ export class HttpService {
     return this.http.get<any>(this.endpoint + "/getFiles", this.headerConfig)
   }
 
-  downloadFile(_id: String) {
+  downloadFile(_id: String): Observable<any> {
     return this.http.get(this.endpoint + "/downloadFile/" + _id, {
       headers: this.headerConfig,
       responseType: 'blob',
-      observe: 'response'
-    }).subscribe((response: any) => {
-      console.log(response.headers.get('Content-Disposition') )
-			let blob:any = new Blob([response]);
-			const url = window.URL.createObjectURL(blob);
-			//window.open(url);
-			saveAs(blob, 'employees.json');
-			})
-     
-  
+      observe: "response"
+    })
+
 
   }
 

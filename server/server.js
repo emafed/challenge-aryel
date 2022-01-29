@@ -68,13 +68,18 @@ app.post('/uploadFile', upload.single('file'), (req, res) => {
     error.httpStatusCode = 400
     return next(error)
   }
-  insertFile(file.fieldname, 0, "", file.originalname, file.size, file.mime)
+  console.log(file)
+  insertFile(file.fieldname, 0, "", file.originalname, file.size, file.mimetype)
   res.status(200).send({ res: "File caricato" })
 })
 
 app.get("/downloadFile/:_id", (req, res) => {
-  FileModel.find({ id: req.params._id }, function (err, data) {
-    res.download(vars.UPLOADS_FOLDER + "/" + data[0].fileName );//+ "." + data.extension
+  let id = mongoose.Types.ObjectId(req.params._id)
+  FileModel.findById(id, function (err, data) {
+    console.log(id)
+    console.log(data)
+    res.set("Access-Control-Expose-Headers","*")
+    res.download(vars.UPLOADS_FOLDER + "/" + data.fileName ,data.fileName);//+ "." + data.extension
   })
   
 })
