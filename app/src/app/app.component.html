@@ -32,10 +32,42 @@
       <mat-cell *matCellDef="let element"> {{element.fileName}} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="opt" stickyEnd>
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let element" style="max-width: 20px;"> 
+        <button mat-icon-button [matMenuTriggerFor]="tableMenu" [matMenuTriggerData]="{element: element}">
+          <mat-icon>more_vert</mat-icon>
+        </button> 
+      </mat-cell>
+    </ng-container>
+
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
   </mat-table>
 </div>
+
+
+<mat-menu #tableMenu="matMenu">
+  <ng-template matMenuContent let-element="element">
+    <button mat-menu-item (click)="downloadFile(element._id)">
+      <mat-icon>cloud_download</mat-icon>
+      Scarica
+    </button>
+    <button mat-menu-item (click)="deleteFile(element._id)">
+      <mat-icon>delete</mat-icon>
+      Elimina
+    </button>
+  </ng-template>
+</mat-menu>
+
+<div class="pDiv" [hidden]="progress == undefined">
+  <div class="pDivChild">
+    <mat-progress-spinner color="accent" mode="determinate" [value]="progress">
+    </mat-progress-spinner>
+    <div style="position:relative; top: -60px; left: 30px; color: rgb(255, 255, 255);">{{progress}} %</div>
+  </div>
+</div>
+
 
 
 <router-outlet></router-outlet>

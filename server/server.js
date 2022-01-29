@@ -1,4 +1,4 @@
-var env = require("./env")
+var vars = require("./vars")
 
 var cors = require('cors')
 const express = require('express')
@@ -7,10 +7,11 @@ const { Schema } = mongoose;
 var FormData = require('form-data');
 var fs = require('fs');
 var multer = require('multer')
+var bodyParser = require('body-parser')
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads')
+    cb(null, vars.UPLOADS_FOLDER)
   },
   filename: function (req, file, cb) {
     console.log(file)
@@ -20,7 +21,9 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 const app = express()
+
 app.use(cors())
+app.use(bodyParser.json())
 
 const FileCollection = new Schema({
   type: String,
@@ -55,7 +58,7 @@ async function insertFile(type, level, parentId, fileName, size, mime) {
 
 
 async function mongoConnect() {
-  await mongoose.connect(env.MONGO_URL);
+  await mongoose.connect(vars.MONGO_URL);
 }
 
 app.post('/uploadFile', upload.single('file'), (req, res) => {
@@ -69,18 +72,29 @@ app.post('/uploadFile', upload.single('file'), (req, res) => {
   res.status(200).send({ res: "File caricato" })
 })
 
-app.get("/downloadFile", (req, res) => {
-  res.download("uploads/WIN_20220122_10_15_53_Pro.mp4");
+app.get("/downloadFile/:_id", (req, res) => {
+  FileModel.find({ id: req.params._id }, function (err, data) {
+    res.download(vars.UPLOADS_FOLDER + "/" + data[0].fileName );//+ "." + data.extension
+  })
+  
+})
+
+app.delete("/deleteFile/:_id", (req, res) => {
+  FileModel.deleteOne({ _id: req.params._id }).then(function () {
+    res.status(200).send({ res: "File eliminato" })
+  }).catch(function (error) {
+    res.status(500).send({ res: "Errore" })
+  });
 })
 
 app.get("/getFiles", (req, res) => {
-  FileModel.find({ id:0 }, function (err, data) {
+  FileModel.find({ id: 0 }, function (err, data) {
     if (err) {
       console.log(err);
       return
     }
     if (data.length == 0) {
-      res.status(200).send({res: "No record found"})
+      res.status(200).send([])
       return
     }
     res.status(200).send(data)
@@ -88,7 +102,10 @@ app.get("/getFiles", (req, res) => {
 
 })
 
-app.listen(env.NODE_PORT, () => {
-  console.log("Server listening on port " + env.NODE_PORT)
+app.listen(vars.NODE_PORT, () => {
+  console.log("Server listening on port " + vars.NODE_PORT)
   mongoConnect()
+  if (!fs.existsSync(vars.UPLOADS_FOLDER)) {
+    fs.mkdirSync(vars.UPLOADS_FOLDER);
+  }
 })
