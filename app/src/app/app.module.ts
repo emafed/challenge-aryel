@@ -15,6 +15,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeIt from '@angular/common/locales/it';
+registerLocaleData(localeIt);
 
 @NgModule({
   declarations: [
@@ -37,7 +41,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatSnackBarModule
   ],
-  providers: [],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'it' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

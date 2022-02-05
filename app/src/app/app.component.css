@@ -19,6 +19,10 @@ background: white;
   /* border-bottom: 1px solid black; */
 }
 
+.mat-column-opt {
+  max-width: 20px;
+}
+
 
 div.pDiv {
   background: rgba(0, 0, 0, 0.603); 

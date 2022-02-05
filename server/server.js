@@ -7,15 +7,15 @@ const { Schema } = mongoose;
 var FormData = require('form-data');
 var fs = require('fs');
 var multer = require('multer')
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const { path } = require("express/lib/application");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, vars.UPLOADS_FOLDER)
   },
   filename: function (req, file, cb) {
-    console.log(file)
-    cb(null, file.originalname)
+    cb(null, String(Math.floor(Date.now() / 1000)))
   }
 })
 
@@ -29,6 +29,7 @@ const FileCollection = new Schema({
   type: String,
   level: Number,
   parentId: String,
+  path: String,
   fileName: String,
   originalFileName: String,
   size: Number,
@@ -41,12 +42,13 @@ const FileCollection = new Schema({
 const FileModel = mongoose.model('FileModel', FileCollection);
 
 
-async function insertFile(type, level, parentId, fileName, size, mime) {
+async function insertFile(type, level, parentId, fileName, size, mime, path) {
   var extension = fileName.split(".").pop();
   const f = new FileModel({
     type: type,
     level: level,
     parentId: parentId,
+    path: path,
     fileName: fileName,
     originalFileName: fileName,
     size: size,
@@ -68,24 +70,22 @@ app.post('/uploadFile', upload.single('file'), (req, res) => {
     error.httpStatusCode = 400
     return next(error)
   }
-  console.log(file)
-  insertFile(file.fieldname, 0, "", file.originalname, file.size, file.mimetype)
+  insertFile(file.fieldname, 0, "", file.originalname, file.size, file.mimetype, file.filename)
   res.status(200).send({ res: "File caricato" })
 })
 
 app.get("/downloadFile/:_id", (req, res) => {
   let id = mongoose.Types.ObjectId(req.params._id)
   FileModel.findById(id, function (err, data) {
-    console.log(id)
-    console.log(data)
-    res.set("Access-Control-Expose-Headers","*")
-    res.download(vars.UPLOADS_FOLDER + "/" + data.fileName ,data.fileName);//+ "." + data.extension
+    res.set("Access-Control-Expose-Headers", "*")
+    res.download(vars.UPLOADS_FOLDER + "/" + data.path, data.fileName);//+ "." + data.extension
   })
-  
+
 })
 
 app.delete("/deleteFile/:_id", (req, res) => {
-  FileModel.deleteOne({ _id: req.params._id }).then(function () {
+  FileModel.findOneAndDelete({ _id: req.params._id }).then(function (data) {
+    fs.unlinkSync(vars.UPLOADS_FOLDER + "/" + data.path)
     res.status(200).send({ res: "File eliminato" })
   }).catch(function (error) {
     res.status(500).send({ res: "Errore" })

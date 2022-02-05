@@ -30,7 +30,7 @@ export interface Files {
 export class AppComponent {
   constructor(private dialog: MatDialog, private httpService: HttpService, private _snackBar: MatSnackBar) { }
   title = 'challenge-aryel';
-  displayedColumns: string[] = ['level', 'fileName', 'opt'];
+  displayedColumns: string[] = ['fileName', 'loadDate', 'modDate', 'opt'];
   dataSource: any;
   progress: any = undefined;
   clickedRows = new Set<Files>();
@@ -48,7 +48,10 @@ export class AppComponent {
   }
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, "OK");
+    this._snackBar.open(message, undefined, { 
+      duration: 3000,
+      panelClass: ['mat-toolbar', 'mat-primary']
+    });
   }
 
   getFiles() {
