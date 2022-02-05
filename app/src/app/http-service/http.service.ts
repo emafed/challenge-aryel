@@ -21,6 +21,10 @@ export class HttpService {
     })
   }
 
+  createFolder(folderName: string) {
+    return this.http.get<any>(this.endpoint + "/createFolder/" + folderName, this.headerConfig)
+  }
+
   getFiles() {
     return this.http.get<any>(this.endpoint + "/getFiles", this.headerConfig)
   }

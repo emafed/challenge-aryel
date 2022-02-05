@@ -26,8 +26,7 @@ app.use(cors())
 app.use(bodyParser.json())
 
 const FileCollection = new Schema({
-  type: String,
-  level: Number,
+  order: Number,
   parentId: String,
   path: String,
   fileName: String,
@@ -42,11 +41,11 @@ const FileCollection = new Schema({
 const FileModel = mongoose.model('FileModel', FileCollection);
 
 
-async function insertFile(type, level, parentId, fileName, size, mime, path) {
-  var extension = fileName.split(".").pop();
+async function insertFile(parentId, fileName, size, mime, path) {
+  var extension = (mime != "") ? fileName.split(".").pop() : "";
+  var order = (mime != "") ? 0 : 1; // 1 folder 0 file
   const f = new FileModel({
-    type: type,
-    level: level,
+    order: order,
     parentId: parentId,
     path: path,
     fileName: fileName,
@@ -70,30 +69,36 @@ app.post('/uploadFile', upload.single('file'), (req, res) => {
     error.httpStatusCode = 400
     return next(error)
   }
-  insertFile(file.fieldname, 0, "", file.originalname, file.size, file.mimetype, file.filename)
+  insertFile("", file.originalname, file.size, file.mimetype, file.filename)
   res.status(200).send({ res: "File caricato" })
+})
+
+app.get('/createFolder/:_folderName', (req, res) => {
+  insertFile("", req.params._folderName, 0, "", "");
+  res.status(200).send({ res: "File caricato" });
 })
 
 app.get("/downloadFile/:_id", (req, res) => {
   let id = mongoose.Types.ObjectId(req.params._id)
   FileModel.findById(id, function (err, data) {
-    res.set("Access-Control-Expose-Headers", "*")
-    res.download(vars.UPLOADS_FOLDER + "/" + data.path, data.fileName);//+ "." + data.extension
+    res.set("Access-Control-Expose-Headers", "*");
+    res.download(vars.UPLOADS_FOLDER + "/" + data.path, data.fileName);
   })
-
 })
 
 app.delete("/deleteFile/:_id", (req, res) => {
   FileModel.findOneAndDelete({ _id: req.params._id }).then(function (data) {
-    fs.unlinkSync(vars.UPLOADS_FOLDER + "/" + data.path)
-    res.status(200).send({ res: "File eliminato" })
+    if (data.path != "") {
+      fs.unlinkSync(vars.UPLOADS_FOLDER + "/" + data.path);
+    }
+    res.status(200).send({ res: "File eliminato" });
   }).catch(function (error) {
-    res.status(500).send({ res: "Errore" })
+    res.status(500).send({ res: "Errore" });
   });
 })
 
 app.get("/getFiles", (req, res) => {
-  FileModel.find({ id: 0 }, function (err, data) {
+  FileModel.find({ id: 0 }).sort({order: -1, modDate: 1}).exec(function (err, data) {
     if (err) {
       console.log(err);
       return

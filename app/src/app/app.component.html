@@ -22,6 +22,15 @@
 <div class="home">
   <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <img [src]="element.extension=='jpg'?
+              '../assets/images/image.png':
+              element.extension=='pdf'?'../assets/images/pdf.png':
+              '../assets/images/folder.png'" width="25" height="25">
+      </mat-cell>
+    </ng-container>
 
 
     <ng-container matColumnDef="fileName">
@@ -35,13 +44,13 @@
     </ng-container>
 
     <ng-container matColumnDef="loadDate">
-      <mat-header-cell *matHeaderCellDef>  Data caricamento </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Data caricamento </mat-header-cell>
       <mat-cell *matCellDef="let element"> {{element.loadDate | date :'medium'}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="opt">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
-      <mat-cell *matCellDef="let element" >
+      <mat-cell *matCellDef="let element">
         <button mat-icon-button [matMenuTriggerFor]="tableMenu" [matMenuTriggerData]="{element: element}">
           <mat-icon>more_vert</mat-icon>
         </button>

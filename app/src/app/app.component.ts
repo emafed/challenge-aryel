@@ -8,8 +8,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import * as FileSaver from 'file-saver';
 
 export interface Files {
-  type: String,
-  level: Number,
   parentId: String,
   fileName: String,
   originalFileName: String,
@@ -30,7 +28,7 @@ export interface Files {
 export class AppComponent {
   constructor(private dialog: MatDialog, private httpService: HttpService, private _snackBar: MatSnackBar) { }
   title = 'challenge-aryel';
-  displayedColumns: string[] = ['fileName', 'loadDate', 'modDate', 'opt'];
+  displayedColumns: string[] = ['type', 'fileName', 'loadDate', 'modDate', 'opt'];
   dataSource: any;
   progress: any = undefined;
   clickedRows = new Set<Files>();
@@ -44,11 +42,23 @@ export class AppComponent {
   }
 
   openDialog() {
-    this.dialog.open(NewFolderDialog);
+    const dialogRef = this.dialog.open(NewFolderDialog);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == "") {
+        this.openSnackBar("Il nome non può essere vuoto!");
+      } else {
+        this.httpService.createFolder(result).subscribe((res) => {
+          console.log(res);
+          this.getFiles();
+        })
+
+      }
+    });
   }
 
   openSnackBar(message: string) {
-    this._snackBar.open(message, undefined, { 
+    this._snackBar.open(message, undefined, {
       duration: 3000,
       panelClass: ['mat-toolbar', 'mat-primary']
     });
@@ -56,15 +66,15 @@ export class AppComponent {
 
   getFiles() {
     this.httpService.getFiles().subscribe(files => {
-      this.dataSource = files
+      this.dataSource = files;
     });
   }
 
   deleteFile(_id: String) {
     this.httpService.deleteFile(_id).subscribe({
       complete: () => {
-        this.getFiles()
-        this.openSnackBar("File eliminato")
+        this.getFiles();
+        this.openSnackBar("File eliminato");
       },
       error: console.error
     });
