@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Nuona cartella</h1>
+<h1 mat-dialog-title>{{title}}</h1>
 <div mat-dialog-content>
   <div class="form-group">
     <mat-form-field appearance="outline">
@@ -10,5 +10,5 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close [mat-dialog-close]="{action:'A',result:result}">Annulla</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="{action:'C',result:result}">Crea</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="{action:'C',result:result}" [disabled]="result==''">{{submitText}}</button>
 </div>

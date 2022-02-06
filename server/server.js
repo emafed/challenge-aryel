@@ -99,6 +99,21 @@ app.delete("/deleteFile/:_id", (req, res) => {
   });
 })
 
+app.put('/rename/:_id', (req, res) => {
+  let update = {
+    fileName: req.body.fileName,
+    modDate: Date.now()
+  }
+  FileModel.updateOne({ _id: req.params._id }, update, function (err, docs) {
+    if (err) {
+      res.status(500).send({ res: "Errore" });
+    }
+    else {
+      res.status(200).send({ res: "Rinominato con successo" });
+    }
+  });
+});
+
 app.get("/getFiles/:_id?", (req, res) => {
   let qry = (req.params._id != undefined) ? ({ parentId: req.params._id }) : ({ parentId: "" })
   FileModel.find(qry).sort({ order: -1, modDate: 1 }).exec(function (err, data) {

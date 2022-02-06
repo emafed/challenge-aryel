@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
-import { NewFolderDialog } from './newfolder-dialog/newfolder-dialog';
+import { InputDialog } from './input-dialog/input-dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -25,7 +25,7 @@ registerLocaleData(localeIt);
 @NgModule({
   declarations: [
     AppComponent,
-    NewFolderDialog
+    InputDialog
   ],
   imports: [
     BrowserModule,

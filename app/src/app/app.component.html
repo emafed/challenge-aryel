@@ -4,6 +4,10 @@
   <button mat-raised-button color="primary" [matMenuTriggerFor]="menu">Nuovo</button>
 </mat-toolbar>
 
+<mat-toolbar-row>
+  <span>{{getNavigationName()}}</span>
+</mat-toolbar-row>
+
 <mat-menu #menu="matMenu">
   <button mat-menu-item (click)="fileInput.click()">
     <mat-icon>insert_drive_file</mat-icon>
@@ -14,7 +18,7 @@
   <input hidden (change)="onFileSelected($event)" #fileInput type="file" id="file">
 
 
-  <button mat-menu-item (click)="openDialog()">
+  <button mat-menu-item (click)="openDialogNewFolder()">
     <mat-icon>create_new_folder</mat-icon>
     Crea Cartella
   </button>
@@ -41,7 +45,12 @@
 
     <ng-container matColumnDef="fileName">
       <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.fileName}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.fileName}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="size" >
+      <mat-header-cell *matHeaderCellDef> Dimensione </mat-header-cell>
+      <mat-cell *matCellDef="let element" > <div *ngIf="element.mime!=''">{{element.size / 1048576 | number}} MB</div></mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="modDate">
@@ -65,8 +74,9 @@
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="row.mime == '' && !disableRipple &&  manageFolderClick(row._id)"
-      matRipple matRippleColor="rgba(0, 0, 0, 0.400)" [matRippleDisabled]="disableRipple">
+    <mat-row *matRowDef="let row; columns: displayedColumns;"
+      (click)="row.mime == '' && !disableRipple &&  manageFolderClick(row)" matRipple
+      matRippleColor="rgba(0, 0, 0, 0.400)" [matRippleDisabled]="disableRipple">
     </mat-row>
   </mat-table>
 </div>
@@ -77,6 +87,10 @@
     <button mat-menu-item (click)="downloadFile(element._id)" *ngIf="element.mime != ''">
       <mat-icon>cloud_download</mat-icon>
       Scarica
+    </button>
+    <button mat-menu-item (click)="rename(element._id, element.fileName)">
+      <mat-icon>edit</mat-icon>
+      Rinomina
     </button>
     <button mat-menu-item (click)="deleteFile(element._id)">
       <mat-icon>delete</mat-icon>

@@ -1,6 +1,6 @@
 import { Component, ElementRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { NewFolderDialog } from './newfolder-dialog/newfolder-dialog';
+import { InputDialog } from './input-dialog/input-dialog';
 import { HttpService } from './http-service/http.service';
 import { ViewChild } from '@angular/core';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
@@ -28,11 +28,12 @@ export interface Files {
 export class AppComponent {
   constructor(private dialog: MatDialog, private httpService: HttpService, private _snackBar: MatSnackBar) { }
   title = 'challenge-aryel';
-  displayedColumns: string[] = ['type', 'fileName', 'loadDate', 'modDate', 'opt'];
+  displayedColumns: string[] = ['type', 'fileName', 'size', 'loadDate', 'modDate', 'opt'];
   dataSource: any;
   progress: any = undefined;
   clickedRows = new Set<Files>();
   navigationTree: string[] = []
+  navigationName: string[] = ["Home"]
   disableRipple: boolean = false;
 
   @ViewChild('fileInput')
@@ -43,18 +44,17 @@ export class AppComponent {
     this.getFiles()
   }
 
-  openDialog() {
-    const dialogRef = this.dialog.open(NewFolderDialog, { disableClose: true });
-
+  openDialogNewFolder() {
+    const dialogRef = this.dialog.open(InputDialog, {
+      disableClose: true,
+      data: { type: "newFolder" }
+    });
     dialogRef.afterClosed().subscribe(result => {
-      if (result.action == "C" && result.result == "") {
-        this.openSnackBar("Il nome non può essere vuoto!");
-      } else if (result.action == "C") {
+      if (result.action == "C") {
         let parentId = this.navigationTree[this.navigationTree.length - 1]
         this.httpService.createFolder(result.result, parentId).subscribe((res) => {
           this.getFiles();
         })
-
       }
     });
   }
@@ -66,16 +66,16 @@ export class AppComponent {
     });
   }
 
-  getFiles(id: string = "") {
+  getFiles(row?: any) {
     let newId = "";
-    if (id == "") {
+    if (row == undefined) {
       if (this.navigationTree[this.navigationTree.length - 1] == undefined) {
         newId = "";
       } else {
         newId = this.navigationTree[this.navigationTree.length - 1];
       }
     } else {
-      newId = id;
+      newId = row._id;
     }
     this.httpService.getFiles(newId).subscribe(files => {
       this.dataSource = files;
@@ -97,12 +97,28 @@ export class AppComponent {
     });
   }
 
+  rename(_id: string, oldName: string) {
+    const dialogRef = this.dialog.open(InputDialog, {
+      disableClose: true,
+      data: {
+        type: "rename",
+        oldName: oldName
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.action == "C") {
+        this.httpService.rename(_id, result.result).subscribe((res) => {
+          this.getFiles();
+        })
+      }
+    });
+  }
+
   downloadFile(_id: String) {
     this.httpService.downloadFile(_id).subscribe(x => {
       let fileName = ((x.headers.get("Content-Disposition")).split('filename=')[1].split(';')[0]).replaceAll('"', '')
       FileSaver.saveAs(x.body, fileName)
     });
-
   }
 
   onFileSelected(event: any) {
@@ -112,7 +128,7 @@ export class AppComponent {
       let formData: FormData = new FormData();
       let parentId = this.navigationTree[this.navigationTree.length - 1]
       formData.append('file', file, file.name);
-      this.httpService.upload(formData,parentId).subscribe((event: HttpEvent<any>) => {
+      this.httpService.upload(formData, parentId).subscribe((event: HttpEvent<any>) => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
             this.progress = Math.round(event.loaded / event.total! * 100);
@@ -130,13 +146,23 @@ export class AppComponent {
     this.fileInputVar!.nativeElement.value = "";
   }
 
-  manageNavigation(id?: any) {
-    if (id != undefined) {
-      this.navigationTree.push(id);
+  manageNavigation(row?: any) {
+    if (row != undefined) {
+      this.navigationTree.push(row._id);
+      this.navigationName.push(row.fileName);
     } else {
       this.navigationTree.pop();
+      this.navigationName.pop();
       this.getFiles();
     }
+  }
+  getNavigationName(): string {
+    let ret = "";
+    this.navigationName.forEach((element) => {
+      ret += "/" + element
+    })
+    return ret;
+
   }
 
 }

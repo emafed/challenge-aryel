@@ -13,7 +13,7 @@ export class HttpService {
 
   constructor(private http: HttpClient) { }
 
-  upload(file: any,parentId?: string): any {
+  upload(file: any, parentId?: string): any {
     return this.http.post<any>(this.endpoint + "/uploadFile/" + parentId, file, {
       reportProgress: true,
       observe: 'events',
@@ -36,8 +36,10 @@ export class HttpService {
       responseType: 'blob',
       observe: "response"
     })
+  }
 
-
+  rename(_id: string, newFileName: string) {
+    return this.http.put<any>(this.endpoint + "/rename/" + _id, { fileName: newFileName })
   }
 
   deleteFile(_id: String) {
