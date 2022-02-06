@@ -13,20 +13,21 @@ export class HttpService {
 
   constructor(private http: HttpClient) { }
 
-  upload(file: any): any {
-    return this.http.post<any>(this.endpoint + "/uploadFile", file, {
+  upload(file: any,parentId?: string): any {
+    return this.http.post<any>(this.endpoint + "/uploadFile/" + parentId, file, {
       reportProgress: true,
       observe: 'events',
       headers: this.headerConfig
     })
   }
 
-  createFolder(folderName: string) {
-    return this.http.get<any>(this.endpoint + "/createFolder/" + folderName, this.headerConfig)
+  createFolder(folderName: string, parentId?: string) {
+    let req = "/createFolder/" + folderName + "/" + parentId;
+    return this.http.get<any>(this.endpoint + req, this.headerConfig);
   }
 
-  getFiles() {
-    return this.http.get<any>(this.endpoint + "/getFiles", this.headerConfig)
+  getFiles(id: string) {
+    return this.http.get<any>(this.endpoint + "/getFiles/" + id, this.headerConfig)
   }
 
   downloadFile(_id: String): Observable<any> {

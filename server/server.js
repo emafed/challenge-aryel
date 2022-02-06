@@ -62,19 +62,21 @@ async function mongoConnect() {
   await mongoose.connect(vars.MONGO_URL);
 }
 
-app.post('/uploadFile', upload.single('file'), (req, res) => {
+app.post('/uploadFile/:_parentId?', upload.single('file'), (req, res) => {
+  let parentId = (req.params._parentId != 'undefined') ? req.params._parentId : "";
   const file = req.file
   if (!file) {
     const error = new Error('Errore nel caricamento')
     error.httpStatusCode = 400
     return next(error)
   }
-  insertFile("", file.originalname, file.size, file.mimetype, file.filename)
+  insertFile(parentId, file.originalname, file.size, file.mimetype, file.filename)
   res.status(200).send({ res: "File caricato" })
 })
 
-app.get('/createFolder/:_folderName', (req, res) => {
-  insertFile("", req.params._folderName, 0, "", "");
+app.get('/createFolder/:_folderName/:_parentId?', (req, res) => {
+  let parentId = (req.params._parentId != 'undefined') ? req.params._parentId : "";
+  insertFile(parentId, req.params._folderName, 0, "", "");
   res.status(200).send({ res: "File caricato" });
 })
 
@@ -97,8 +99,9 @@ app.delete("/deleteFile/:_id", (req, res) => {
   });
 })
 
-app.get("/getFiles", (req, res) => {
-  FileModel.find({ id: 0 }).sort({order: -1, modDate: 1}).exec(function (err, data) {
+app.get("/getFiles/:_id?", (req, res) => {
+  let qry = (req.params._id != undefined) ? ({ parentId: req.params._id }) : ({ parentId: "" })
+  FileModel.find(qry).sort({ order: -1, modDate: 1 }).exec(function (err, data) {
     if (err) {
       console.log(err);
       return

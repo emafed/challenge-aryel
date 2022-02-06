@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
+import { MatRippleModule } from '@angular/material/core';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
@@ -41,7 +42,8 @@ registerLocaleData(localeIt);
     HttpClientModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    FormsModule
+    FormsModule,
+    MatRippleModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'it' }

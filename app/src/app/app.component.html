@@ -23,12 +23,18 @@
   <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
     <ng-container matColumnDef="type">
-      <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>
+
+        <button mat-icon-button color="primary" *ngIf="navigationTree.length != 0" (click)="manageNavigation()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+      </mat-header-cell>
       <mat-cell *matCellDef="let element">
-        <img [src]="element.extension=='jpg'?
-              '../assets/images/image.png':
+        <img [src]="element.extension==''?
+              '../assets/images/folder.png':
               element.extension=='pdf'?'../assets/images/pdf.png':
-              '../assets/images/folder.png'" width="25" height="25">
+              '../assets/images/image.png'" width="25" height="25">
       </mat-cell>
     </ng-container>
 
@@ -51,21 +57,24 @@
     <ng-container matColumnDef="opt">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let element">
-        <button mat-icon-button [matMenuTriggerFor]="tableMenu" [matMenuTriggerData]="{element: element}">
+        <button mat-icon-button [matMenuTriggerFor]="tableMenu" [matMenuTriggerData]="{element: element}"
+          (mouseenter)="disableRipple=true" (mouseleave)="disableRipple=false">
           <mat-icon>more_vert</mat-icon>
         </button>
       </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="row.mime == '' && !disableRipple &&  manageFolderClick(row._id)"
+      matRipple matRippleColor="rgba(0, 0, 0, 0.400)" [matRippleDisabled]="disableRipple">
+    </mat-row>
   </mat-table>
 </div>
 
 
 <mat-menu #tableMenu="matMenu">
   <ng-template matMenuContent let-element="element">
-    <button mat-menu-item (click)="downloadFile(element._id)">
+    <button mat-menu-item (click)="downloadFile(element._id)" *ngIf="element.mime != ''">
       <mat-icon>cloud_download</mat-icon>
       Scarica
     </button>

@@ -32,6 +32,8 @@ export class AppComponent {
   dataSource: any;
   progress: any = undefined;
   clickedRows = new Set<Files>();
+  navigationTree: string[] = []
+  disableRipple: boolean = false;
 
   @ViewChild('fileInput')
   fileInputVar: ElementRef | undefined;
@@ -42,14 +44,14 @@ export class AppComponent {
   }
 
   openDialog() {
-    const dialogRef = this.dialog.open(NewFolderDialog);
+    const dialogRef = this.dialog.open(NewFolderDialog, { disableClose: true });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result == "") {
+      if (result.action == "C" && result.result == "") {
         this.openSnackBar("Il nome non può essere vuoto!");
-      } else {
-        this.httpService.createFolder(result).subscribe((res) => {
-          console.log(res);
+      } else if (result.action == "C") {
+        let parentId = this.navigationTree[this.navigationTree.length - 1]
+        this.httpService.createFolder(result.result, parentId).subscribe((res) => {
           this.getFiles();
         })
 
@@ -64,10 +66,25 @@ export class AppComponent {
     });
   }
 
-  getFiles() {
-    this.httpService.getFiles().subscribe(files => {
+  getFiles(id: string = "") {
+    let newId = "";
+    if (id == "") {
+      if (this.navigationTree[this.navigationTree.length - 1] == undefined) {
+        newId = "";
+      } else {
+        newId = this.navigationTree[this.navigationTree.length - 1];
+      }
+    } else {
+      newId = id;
+    }
+    this.httpService.getFiles(newId).subscribe(files => {
       this.dataSource = files;
     });
+  }
+
+  manageFolderClick(id: string) {
+    this.manageNavigation(id);
+    this.getFiles(id);
   }
 
   deleteFile(_id: String) {
@@ -93,14 +110,14 @@ export class AppComponent {
     if (fileList.length > 0) {
       let file: File = fileList[0];
       let formData: FormData = new FormData();
+      let parentId = this.navigationTree[this.navigationTree.length - 1]
       formData.append('file', file, file.name);
-      this.httpService.upload(formData).subscribe((event: HttpEvent<any>) => {
+      this.httpService.upload(formData,parentId).subscribe((event: HttpEvent<any>) => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
             this.progress = Math.round(event.loaded / event.total! * 100);
             break;
           case HttpEventType.Response:
-            console.log(event.body);
             setTimeout(() => {
               this.progress = undefined;
               this.getFiles();
@@ -111,6 +128,15 @@ export class AppComponent {
       })
     }
     this.fileInputVar!.nativeElement.value = "";
+  }
+
+  manageNavigation(id?: any) {
+    if (id != undefined) {
+      this.navigationTree.push(id);
+    } else {
+      this.navigationTree.pop();
+      this.getFiles();
+    }
   }
 
 }

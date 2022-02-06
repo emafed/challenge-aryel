@@ -9,6 +9,6 @@
 
 </div>
 <div mat-dialog-actions>
-  <button mat-button mat-dialog-close>Annulla</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="result">Crea</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="{action:'A',result:result}">Annulla</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="{action:'C',result:result}">Crea</button>
 </div>
